@@ -2,10 +2,7 @@ var express = require('express'); //import express framework
 var mongodb = require('mongodb');
 var mydb;
 var pdb;
-//ren's part
-var idb;
 
-//////
 var app = express() //app is using the express framework
 var uri = 'mongodb://chickenlittle:butter@ds255797.mlab.com:55797/population_db';
 var mockDataList = [{
@@ -29,7 +26,7 @@ var appEnv = cfenv.getAppEnv()
 // start the server on the given port and binding host, and print
 // url to server when it starts
 
-app.listen(appEnv.port, '127.0.0.1', function() {
+app.listen(appEnv.port, '0.0.0.0', function() {
     console.log("server starting on " + appEnv.url)
 });
 mongodb.MongoClient.connect(uri, function(err, db) {
@@ -42,7 +39,6 @@ mongodb.MongoClient.connect(uri, function(err, db) {
    */
   mydb = db.db('population_db');
   pdb = mydb.collection('population_db');
-  idb = mydb.collection('individual_db');
    console.log("connect success!!!!");
    
 
@@ -63,6 +59,7 @@ app.get('/api/UpdateQ', function(req, res){
   res.set("Access-Control-Allow-Origin", "*");
   console.log('CALLED update')
 //oh damn
+<<<<<<< HEAD
 
 //Extract last 5 entries from individual_db
 idb.find({}).limit(5).toArray(function (err, docs) {
@@ -78,6 +75,8 @@ idb.find({}).limit(5).toArray(function (err, docs) {
   }, this);
 });
 
+=======
+>>>>>>> 72db8c041ef0d2ee93d37c357059e10e6688ddb7
 pdb.find( {Classification:3}).limit(10).toArray(function(err, docs) {
   return res.json(docs)
 }, this);
