@@ -1,5 +1,9 @@
-var express = require('express')
-var app = express()
+var express = require('express'); //import express framework
+var mongodb = require('mongodb');
+var mydb;
+var pdb;
+var app = express() //app is using the express framework
+var uri = 'mongodb://chickenlittle:butter@ds255797.mlab.com:55797/population_db';
 var mockDataList = [{
   id: 0,
   title: 'Landlord kicking us out without notice',
@@ -15,23 +19,53 @@ var mockDataList = [{
 var generalJSON = [];
 var specializedJSON = [];
 
-var cfenv = require("cfenv")
+var cfenv = require("cfenv")//
 
-var appEnv = cfenv.getAppEnv()
+var appEnv = cfenv.getAppEnv() 
 // start the server on the given port and binding host, and print
 // url to server when it starts
 
-app.listen(appEnv.port, '0.0.0.0', function() {
+app.listen(appEnv.port, '127.0.0.1', function() {
     console.log("server starting on " + appEnv.url)
 });
+mongodb.MongoClient.connect(uri, function(err, db) {
+  
+  if(err) throw err;
+  console.log("success");
+  /*
+   * First we'll add a few songs. Nothing is required to create the 
+   * songs collection; it is created automatically when we insert.
+   */
+  mydb = db.db('population_db');
+  pdb = mydb.collection('population_db');
+   console.log("connect success!!!!");
+   
 
+   // Note that the insert method can take either an array or a dict.
+
+  //  cs = pdb.find({}, { Classification : 3 }, function (err, data) {
+  //   console.log("im here at 54");
+  //   console.log("data being"+ data);
+    
+    
+  // });
+} );
 app.get('/', function(req, res){
   console.log('CALLED')
-  res.send('HI');
+  res.send('HI');//image should be a url
 })
+app.get('/api/UpdateQ', function(req, res){
+  console.log('CALLED')
+//oh damn
 
+pdb.find( {Classification:3}).toArray(function(err, docs) {
+  return res.json(docs)
+}, this);
+//ohohoh
+  //res.send(tor);//image should be a url
+})
 app.get('/api/GetChannels', function(req, res){
-  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "*"); //cors
   var category = req.query.category;
   var general = ['Legal', 'Supply', 'Bill Management', 'Storage', 'Payments', 'Shift Management', 'Distribution', 'Project Management', 'Inventory'];
   var specialized = ['Salons / Barbershops', 'Restaurants', 'Florists', 'Bed n Breakfast', 'Meal to go', 'Music lessons', 'Tutoring']
@@ -60,11 +94,11 @@ console.log(specialized.length);
 });
 
 app.get('/api/GetListOfPost', function(req, res){
-  res.set("Access-Control-Allow-Origin", "*")
-  var channel = req.query.channel;
+  res.set("Access-Control-Allow-Origin", "*")  //doenst send anything
+  var channel = req.query.channel; //dont need this there are diff qurery is for get and body is for post
 
   if(channel == 'Legal')
-    res.json(mockDataList)
+    res.json(mockDataList)  //transform and then send
 
 });
 

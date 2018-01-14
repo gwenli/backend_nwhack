@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2"
+    "cfenv": "^1.0.4",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.1"
   }
 }
