@@ -2,6 +2,10 @@ var express = require('express'); //import express framework
 var mongodb = require('mongodb');
 var mydb;
 var pdb;
+//ren's part
+var idb;
+
+//////
 var app = express() //app is using the express framework
 var uri = 'mongodb://chickenlittle:butter@ds255797.mlab.com:55797/population_db';
 var mockDataList = [{
@@ -38,6 +42,7 @@ mongodb.MongoClient.connect(uri, function(err, db) {
    */
   mydb = db.db('population_db');
   pdb = mydb.collection('population_db');
+  idb = mydb.collection('individual_db');
    console.log("connect success!!!!");
    
 
@@ -55,16 +60,31 @@ app.get('/', function(req, res){
   res.send('HI');//image should be a url
 })
 app.get('/api/UpdateQ', function(req, res){
-  console.log('CALLED')
+  res.set("Access-Control-Allow-Origin", "*");
+  console.log('CALLED update')
 //oh damn
 
-pdb.find( {Classification:3}).toArray(function(err, docs) {
+//Extract last 5 entries from individual_db
+inf_entries = idb.find().limit(5).toArray();
+
+	//Use child_process to run a Python script --> does inference based on last 5 entries in individual DB
+	var spawn = require("child_process").spawn;
+	var process = spawn('python', ["path/to/script.py", "infer", inf_entries, json_path, model_path]);
+
+	//Listen for output from python script --> if output is not null, generate new DB entry
+	process.stdout.on('data', function (data) {
+		console.log(data.toString());    
+		res.write(data);
+	});
+
+pdb.find( {Classification:3}).limit(10).toArray(function(err, docs) {
   return res.json(docs)
 }, this);
 //ohohoh
   //res.send(tor);//image should be a url
 })
-app.get('/api/GetChannels', function(req, res){
+app.get('/api/GetChannels', function(
+  req, res){
   res.set("Access-Control-Allow-Origin", "*"); //cors
   var category = req.query.category;
   var general = ['Legal', 'Supply', 'Bill Management', 'Storage', 'Payments', 'Shift Management', 'Distribution', 'Project Management', 'Inventory'];
