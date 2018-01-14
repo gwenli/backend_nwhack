@@ -65,21 +65,23 @@ app.get('/api/UpdateQ', function(req, res){
 //oh damn
 
 //Extract last 5 entries from individual_db
-inf_entries = idb.find().limit(5).toArray();
+idb.find({}).limit(5).toArray(function (err, docs) {
 
-	//Use child_process to run a Python script --> does inference based on last 5 entries in individual DB
-	var spawn = require("child_process").spawn;
-	var process = spawn('python', ["path/to/script.py", "infer", inf_entries, json_path, model_path]);
+  //Use child_process to run a Python script --> does inference based on last 5 entries in individual DB
+  var spawn = require("child_process").spawn;
+  var process = spawn('python', ['VitalsLSTM.py', 'infer', docs, 'model.json', 'model.h5']);
 
-	//Listen for output from python script --> if output is not null, generate new DB entry
-	process.stdout.on('data', function (data) {
-		console.log(data.toString());    
-		res.write(data);
-	});
+  //Listen for output from python script --> if output is not null, generate new DB entry
+  process.stdout.on('data', function (data) {
+    console.log('done')
+    return res.json(data);
+  }, this);
+});
 
 pdb.find( {Classification:3}).limit(10).toArray(function(err, docs) {
   return res.json(docs)
 }, this);
+
 //ohohoh
   //res.send(tor);//image should be a url
 })
